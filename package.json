@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "license": "MIT",
+  "name": "redeem.gems",
+  "version": "1.0.0",
+  "description": ".gems Redeem",
+  "type": "module",
+  "repository": "git@github.com:dotGems/redeem.gems.git",
+  "contributors": [
+    "Denis Carriere <@DenisCarriere>"
+  ],
+  "scripts": {
+    "build": "blanc++ redeem.gems.cpp -I include",
+    "release": "cdt-cpp redeem.gems.cpp -I include",
+    "test": "node *.spec.js"
+  },
+  "devDependencies": {
+    "@proton/vert": "*"
+  }
+}
