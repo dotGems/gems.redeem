@@ -41,19 +41,24 @@ void redeem::on_nft_transfer( const name from, const name to, const vector<uint6
     for ( const uint64_t asset_id : asset_ids ) {
         auto asset = atomic::get_asset( get_self(), asset_id );
         auto redeem = _redeems.get( asset.template_id, "cannot redeem template_id" );
+        
+        // NFT name attribute
+        atomicdata::ATTRIBUTE_MAP data = atomic::get_template_immutable( asset );
+        const string nft_name = atomic::attribute_to_string(data, "name");
 
         // burn and transfer
         atomic::burnasset( get_self(), asset_id );
 
         if ( redeem.redirect_to_pomelo_grant ) {
-            handle_pomelo_transfer( from, redeem.quantity, memo);
+            handle_pomelo_transfer( from, redeem.quantity, memo, nft_name);
         } else {
-            transfer( get_self(), from, redeem.quantity, "🎈 EOS Aidrop redeemed by this NFT");
+            const string message = "🪂💰 [" + from.to_string() + "] has redeemed a " + nft_name + " Airdrop!";
+            transfer( get_self(), from, redeem.quantity, message.c_str());
         }
     }
 }
 
-void redeem::handle_pomelo_transfer( const name from, const extended_asset value, const string memo )
+void redeem::handle_pomelo_transfer( const name from, const extended_asset value, const string memo, const string nft_name )
 {
     pomelo::globals_table _globals( "app.pomelo"_n, "app.pomelo"_n.value );
     pomelo::grants_table _grants( "app.pomelo"_n, "app.pomelo"_n.value );
@@ -82,8 +87,8 @@ void redeem::handle_pomelo_transfer( const name from, const extended_asset value
     }
     check( active_grant, "Pomelo Grant is not active");
 
-    transfer( get_self(), itr.funding_account, value, "🙏 [" + from.to_string() + "] has sent a Pomelo Gift Certificate redeemed by this NFT");
-
+    const string message = "🍈💰 [" + from.to_string() + "] has redeemed a " + nft_name + " and donated to your [" + grant.to_string() + "] Pomelo Grant!";
+    transfer( get_self(), itr.funding_account, value, message.c_str());
 }
 
 void redeem::transfer( const name from, const name to, const extended_asset value, const string memo )
@@ -91,4 +96,3 @@ void redeem::transfer( const name from, const name to, const extended_asset valu
     eosio::token::transfer_action transfer( value.contract, { from, "active"_n });
     transfer.send( from, to, value.quantity, memo );
 }
-

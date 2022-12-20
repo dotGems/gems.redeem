@@ -56,5 +56,5 @@ public:
 
 private:
     void transfer( const name from, const name to, const extended_asset value, const string memo );
-    void handle_pomelo_transfer( const name from, const extended_asset value, const string memo );
+    void handle_pomelo_transfer( const name from, const extended_asset value, const string memo, string nft_name );
 };
