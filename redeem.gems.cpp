@@ -1,7 +1,17 @@
 #include "./redeem.gems.hpp"
 
 [[eosio::action]]
-void redeem::setredeem( const uint32_t template_id, const asset quantity, const bool pomelo_grant )
+void redeem::delredeem( const uint32_t template_id )
+{
+    require_auth( get_self() );
+
+    redeem::redeems_table _redeems( get_self(), get_self().value );
+    auto & itr = _redeems.get( template_id, "template_id does not exists" );
+    _redeems.erase( itr );
+}
+
+[[eosio::action]]
+void redeem::setredeem( const uint32_t template_id, const asset quantity, const bool redirect_to_pomelo_grant )
 {
     require_auth( get_self() );
 
@@ -16,7 +26,7 @@ void redeem::setredeem( const uint32_t template_id, const asset quantity, const 
     auto insert = [&]( auto & row ) {
         row.template_id = template_id;
         row.quantity = extended_asset{quantity, "eosio.token"_n};
-        row.pomelo_grant = pomelo_grant;
+        row.redirect_to_pomelo_grant = redirect_to_pomelo_grant;
     };
 
     if ( itr == _redeems.end() ) _redeems.emplace( get_self(), insert );
@@ -37,7 +47,6 @@ void redeem::on_nft_transfer( const name from, const name to, const vector<uint6
         transfer( get_self(), from, redeem.quantity, "redeemed from NFT");
     }
 }
-
 
 void redeem::transfer( const name from, const name to, const extended_asset value, const string memo )
 {

@@ -26,7 +26,7 @@ $ blanc++ eosio.time.cpp
 
 - `{uint32_t} template_id` - (primary key) AtomicAsset NFT template ID
 - `{extended_asset} quantity` - redeemable quantity
-- `{bool} pomelo_grant` - send redeem to active Pomelo Grant
+- `{bool} redirect_to_pomelo_grant` - redirect redeemable amount to an active Pomelo Grant
 
 ### example
 
@@ -34,6 +34,6 @@ $ blanc++ eosio.time.cpp
 {
     "template_id": 123,
     "quantity": {"contract": "eosio.token", "quantity": "1.0000 EOS"},
-    "pomelo_grant": true
+    "redirect_to_pomelo_grant": true
 }
 ```
