@@ -48,6 +48,9 @@ public:
     [[eosio::action]]
     void delredeem( const uint32_t template_id );
 
+    // [[eosio::action]]
+    // void test( const string memo );
+
     /**
      * Notify contract when AtomicAssets NFT token transfer notifiers relay contract
      */
@@ -57,4 +60,5 @@ public:
 private:
     void transfer( const name from, const name to, const extended_asset value, const string memo );
     void handle_pomelo_transfer( const name from, const extended_asset value, const string memo, string nft_name );
+    name parse_pomelo_grant_name( string memo );
 };

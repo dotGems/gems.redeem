@@ -58,6 +58,24 @@ void redeem::on_nft_transfer( const name from, const name to, const vector<uint6
     }
 }
 
+name redeem::parse_pomelo_grant_name( string memo )
+{
+    // remove URL pathing
+    const string toReplace = "https://pomelo.io/grants/";
+    const size_t pos = memo.find(toReplace);
+    memo = memo.replace(pos, toReplace.length(), "");
+
+    // parse name
+    const name grant = utils::parse_name(memo);
+    check( grant.value, "invalid Pomelo Grant name (ex: hotsauce)" );
+    return grant;
+}
+
+// [[eosio::action]]
+// void redeem::test( const string memo ) {
+//     parse_pomelo_grant_name(memo);
+// }
+
 void redeem::handle_pomelo_transfer( const name from, const extended_asset value, const string memo, const string nft_name )
 {
     pomelo::globals_table _globals( "app.pomelo"_n, "app.pomelo"_n.value );
@@ -67,10 +85,9 @@ void redeem::handle_pomelo_transfer( const name from, const extended_asset value
 
     uint16_t season_id = _globals.get().season_id;
     vector<uint16_t> round_ids = _seasons.get( season_id, "Pomelo Season does not exists" ).round_ids;
-    const name grant = utils::parse_name(memo);
-
-    check( grant.value, "invalid Pomelo Grant name (ex: hotsauce)" );
-    auto & itr = _grants.get( utils::parse_name(memo).value, "Pomelo Grant does not exists" );
+    const name grant = parse_pomelo_grant_name(memo);
+    
+    auto & itr = _grants.get( grant.value, "Pomelo Grant does not exists" );
     check( itr.status == "published"_n, "Pomelo Grant is not published" );
 
     bool active_grant = false;
