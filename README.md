@@ -19,3 +19,21 @@ $ cdt-cpp eosio.time.cpp
 # using Blanc++
 $ blanc++ eosio.time.cpp
 ```
+
+## TABLE `redeems`
+
+### params
+
+- `{uint32_t} template_id` - (primary key) AtomicAsset NFT template ID
+- `{extended_asset} quantity` - redeemable quantity
+- `{bool} pomelo_grant` - send redeem to active Pomelo Grant
+
+### example
+
+```json
+{
+    "template_id": 123,
+    "quantity": {"contract": "eosio.token", "quantity": "1.0000 EOS"},
+    "pomelo_grant": true
+}
+```
