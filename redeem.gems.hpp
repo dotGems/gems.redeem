@@ -5,6 +5,8 @@
 // AtomicAssets
 #include <eosio.token/eosio.token.hpp>
 #include <gems/atomic.gems.hpp>
+#include <utils/utils.hpp>
+#include <pomelo/pomelo.hpp>
 
 using namespace eosio;
 
@@ -54,4 +56,5 @@ public:
 
 private:
     void transfer( const name from, const name to, const extended_asset value, const string memo );
+    void handle_pomelo_transfer( const name from, const extended_asset value, const string memo );
 };

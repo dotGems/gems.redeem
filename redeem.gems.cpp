@@ -44,8 +44,46 @@ void redeem::on_nft_transfer( const name from, const name to, const vector<uint6
 
         // burn and transfer
         atomic::burnasset( get_self(), asset_id );
-        transfer( get_self(), from, redeem.quantity, "redeemed from NFT");
+
+        if ( redeem.redirect_to_pomelo_grant ) {
+            handle_pomelo_transfer( from, redeem.quantity, memo);
+        } else {
+            transfer( get_self(), from, redeem.quantity, "🎈 EOS Aidrop redeemed by this NFT");
+        }
     }
+}
+
+void redeem::handle_pomelo_transfer( const name from, const extended_asset value, const string memo )
+{
+    pomelo::globals_table _globals( "app.pomelo"_n, "app.pomelo"_n.value );
+    pomelo::grants_table _grants( "app.pomelo"_n, "app.pomelo"_n.value );
+    pomelo::rounds_table _rounds( "app.pomelo"_n, "app.pomelo"_n.value );
+    pomelo::seasons_table _seasons( "app.pomelo"_n, "app.pomelo"_n.value );
+
+    uint16_t season_id = _globals.get().season_id;
+    vector<uint16_t> round_ids = _seasons.get( season_id, "Pomelo Season does not exists" ).round_ids;
+    const name grant = utils::parse_name(memo);
+
+    check( grant.value, "invalid Pomelo Grant name (ex: hotsauce)" );
+    auto & itr = _grants.get( utils::parse_name(memo).value, "Pomelo Grant does not exists" );
+    check( itr.status == "published"_n, "Pomelo Grant is not published" );
+
+    bool active_grant = false;
+    for ( const uint16_t round_id : round_ids ) {
+        pomelo::rounds_table _rounds( "app.pomelo"_n, "app.pomelo"_n.value );
+        auto & round = _rounds.get( round_id, "Pomelo Grant round_id does not exists" );
+
+        for ( const name grand_id : round.grant_ids ) {
+            if ( grand_id == grant ) {
+                active_grant = true;
+                break;
+            }
+        }
+    }
+    check( active_grant, "Pomelo Grant is not active");
+
+    transfer( get_self(), itr.funding_account, value, "🙏 [" + from.to_string() + "] has sent a Pomelo Gift Certificate redeemed by this NFT");
+
 }
 
 void redeem::transfer( const name from, const name to, const extended_asset value, const string memo )
