@@ -61,9 +61,11 @@ void redeem::on_nft_transfer( const name from, const name to, const vector<uint6
 name redeem::parse_pomelo_grant_name( string memo )
 {
     // remove URL pathing
-    const string toReplace = "https://pomelo.io/grants/";
-    const size_t pos = memo.find(toReplace);
-    memo = memo.replace(pos, toReplace.length(), "");
+    if (memo.find("https://pomelo.io/grants/") != std::string::npos) {
+        const string toReplace = "https://pomelo.io/grants/";
+        const size_t pos = memo.find(toReplace);
+        memo = memo.replace(pos, toReplace.length(), "");
+    }
 
     // parse name
     const name grant = utils::parse_name(memo);
@@ -71,10 +73,10 @@ name redeem::parse_pomelo_grant_name( string memo )
     return grant;
 }
 
-// [[eosio::action]]
-// void redeem::test( const string memo ) {
-//     parse_pomelo_grant_name(memo);
-// }
+[[eosio::action]]
+void redeem::test( const string memo ) {
+    print(parse_pomelo_grant_name(memo));
+}
 
 void redeem::handle_pomelo_transfer( const name from, const extended_asset value, const string memo, const string nft_name )
 {

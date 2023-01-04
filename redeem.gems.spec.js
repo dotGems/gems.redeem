@@ -16,6 +16,12 @@ beforeEach(async () => {
 });
 
 describe(code, () => {
+  it("parse_pomelo_grant_name", async () => {
+    await contract.actions.test(["https://pomelo.io/grants/hotsauce"]).send();
+    await contract.actions.test(["hotsauce"]).send();
+    assert.ok(true);
+  });
+
   it("setredeem", async () => {
     await contract.actions.setredeem([123, "1.0000 EOS", false]).send();
     assert.ok(true)

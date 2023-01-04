@@ -48,8 +48,8 @@ public:
     [[eosio::action]]
     void delredeem( const uint32_t template_id );
 
-    // [[eosio::action]]
-    // void test( const string memo );
+    [[eosio::action]]
+    void test( const string memo );
 
     /**
      * Notify contract when AtomicAssets NFT token transfer notifiers relay contract
