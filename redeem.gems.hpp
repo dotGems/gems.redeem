@@ -51,11 +51,16 @@ public:
     [[eosio::action]]
     void test( const string memo );
 
+    [[eosio::action]]
+    void redeemlog( const name account, const uint64_t asset_id, const string nft_name, const asset quantity, const bool redirected_to_grant, const string memo);
+
     /**
      * Notify contract when AtomicAssets NFT token transfer notifiers relay contract
      */
     [[eosio::on_notify("atomicassets::transfer")]]
     void on_nft_transfer( const name from, const name to, const vector<uint64_t> asset_ids, const std::string memo );
+
+    using redeemlog_action = eosio::action_wrapper<"redeemlog"_n, &redeem::redeemlog>;
 
 private:
     void transfer( const name from, const name to, const extended_asset value, const string memo );

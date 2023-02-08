@@ -37,11 +37,12 @@ void redeem::setredeem( const uint32_t template_id, const asset quantity, const 
 void redeem::on_nft_transfer( const name from, const name to, const vector<uint64_t> asset_ids, const std::string memo )
 {
     redeem::redeems_table _redeems( get_self(), get_self().value );
+    redeemlog_action redeemlog( get_self(), { get_self(), "active"_n });
 
     for ( const uint64_t asset_id : asset_ids ) {
         auto asset = atomic::get_asset( get_self(), asset_id );
         auto redeem = _redeems.get( asset.template_id, "cannot redeem template_id" );
-        
+
         // NFT name attribute
         atomicdata::ATTRIBUTE_MAP data = atomic::get_template_immutable( asset );
         const string nft_name = atomic::attribute_to_string(data, "name");
@@ -55,7 +56,15 @@ void redeem::on_nft_transfer( const name from, const name to, const vector<uint6
             const string message = "🪂💰 [" + from.to_string() + "] has redeemed a " + nft_name + " Airdrop!";
             transfer( get_self(), from, redeem.quantity, message.c_str());
         }
+
+        redeemlog.send( from, asset_id, nft_name, redeem.quantity.quantity, redeem.redirect_to_pomelo_grant, memo );
     }
+}
+
+[[eosio::action]]
+void redeem::redeemlog( const name account, const uint64_t asset_id, const string nft_name, const asset quantity, const bool redirected_to_grant, const string memo )
+{
+    require_auth( get_self() );
 }
 
 name redeem::parse_pomelo_grant_name( string memo )
